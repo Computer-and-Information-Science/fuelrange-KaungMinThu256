@@ -1,0 +1,35 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: fuelrange test1
+      id: fuelrange-test1
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: fuelrange test1
+        setup-command: g++ main.cpp
+        command: "./a.out"
+        input: |-
+          15.5
+          25.3
+          75
+        expected-output: '294.11'
+        comparison-method: contains
+        timeout: 10
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        FUELRANGE-TEST1_RESULTS: "${{steps.fuelrange-test1.outputs.result}}"
+      with:
+        runners: fuelrange-test1
